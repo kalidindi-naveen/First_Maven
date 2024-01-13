@@ -10,14 +10,15 @@ pipeline {
                 echo 'Hello World'
             }
         }
-        stage('Git Clone') {
-            steps {
-                git branch: 'main', credentialsId: 'github-tkn', url: 'https://github.com/kalidindi-naveen/First_Maven.git'
-            }
-        }
+        // No Need this if we use Poll SCM (it will automatically clone code)
+        // stage('Git Clone') {
+        //    steps {
+        //        git branch: 'main', credentialsId: 'github-tkn', url: 'https://github.com/kalidindi-naveen/First_Maven.git'
+        //    }
+        // }
         stage('Maven') {
             steps {
-                sh 'mvn clean install'
+                sh '/opt/maven/bin/mvn clean install'
             }
         }
     }
