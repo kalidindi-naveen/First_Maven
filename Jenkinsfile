@@ -27,7 +27,7 @@ pipeline {
         stage('Static code analysis: Sonarqube') {
             steps {
                 script {
-                    sh 'mvn clean sonar:sonar -Dsonar.login=sonar-tkn -Dsonar.host.url=http://3.89.81.238:9000/'
+                    sh 'mvn clean sonar:sonar -Dsonar.token=sonar-tkn -Dsonar.host.url=http://3.89.81.238:9000/'
                 }
             }
         }
