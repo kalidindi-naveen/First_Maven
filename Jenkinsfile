@@ -24,5 +24,12 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
+        stage('Static code analysis: Sonarqube') {
+            steps {
+                script {
+                    sh 'mvn clean sonar:sonar -Dsonar.login=sonar-tkn'
+                }
+            }
+        }
     }
 }
