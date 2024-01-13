@@ -4,6 +4,9 @@ pipeline {
             label 'maven'
         }
     }
+    environment {
+        PATH="/opt/maven/bin:$PATH"
+    }
     stages {
         stage('Hello') {
             steps {
@@ -18,7 +21,7 @@ pipeline {
         // }
         stage('Maven') {
             steps {
-                sh '/opt/maven/bin/mvn clean install'
+                sh 'mvn clean install'
             }
         }
     }
