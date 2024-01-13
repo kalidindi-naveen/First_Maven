@@ -24,9 +24,15 @@ pipeline {
 
         stage('Maven') {
             steps {
-                sh 'mvn clean install'
+                echo "-----------------------Build Started-----------------------"
+                sh 'mvn clean install -DskipTests'
+                echo "-----------------------Build Completed-----------------------"
+                echo "-----------------------Test Started-----------------------"
+                sh 'mvn surefire-report:report'
+                echo "-----------------------Test Completed-----------------------"
             }
         }
+
         // stage('Static code analysis: Sonarqube') {
         //     steps {
         //         script {
