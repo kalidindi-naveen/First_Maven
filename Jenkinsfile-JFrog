@@ -74,11 +74,14 @@ pipeline {
                     def uploadSpec = """{
                         "files": [
                           {
-                            "pattern": "target/(*)",
-                            "target": "first_maven-libs-release-local/{1}",
-                            "flat": false,
+                            "pattern": {
+                              "include": "target/*",
+                              "exclude": ["target/*.sha1", "target/*.md5", "target/classes/**", "target/test-classes/**", "target/maven-archiver/**", "target/maven-status/**", "target/site/**", "target/surefire-reports/**"]
+                            },
+                            "target": "first_maven-libs-snapshot-local/{1}",
+                            "flat": "false",
                             "props" : "${properties}",
-                            "exclusions": [ "*.sha1", "*.md5", "classes/**", "test-classes/**","maven-archiver/**","maven-status/**","site/**","surefire-reports/**"]
+                            "exclusions": [ "*.sha1", "*.md5"]
                           }
                         ]
                     }"""
