@@ -1,4 +1,5 @@
-def registry = 'http://44.222.184.55:8082/'
+def JFrog_registry = 'http://44.222.184.55:8082/'
+def Docker_registry = 'https://hub.docker.com/'
 def imageName = 'naveen2809/sample-java-app'
 def version   = '2.0.0'
 pipeline {
@@ -71,7 +72,7 @@ pipeline {
               steps {
                   script {
                     echo '<--------------- Jar Publish Started --------------->'
-                    def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"jfrog-tkn"
+                    def server = Artifactory.newServer url:JFrog_registry+"/artifactory" ,  credentialsId:"jfrog-tkn"
                     def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
                     def uploadSpec = """{
                         "files": [
@@ -102,7 +103,7 @@ pipeline {
       stage ("Docker Publish "){
           steps {
               script {
-                  docker.withRegistry(registry, 'docker-tkn'){
+                  docker.withRegistry(Docker_registry, 'docker-tkn'){
                       app.push()
                   }
               }
