@@ -1,5 +1,5 @@
 def JFrog_registry = 'http://44.222.184.55:8082/'
-def Docker_registry = 'https://hub.docker.com/'
+def Docker_registry = 'https://index.docker.io/'
 def imageName = 'naveen2809/sample-java-app'
 def version   = '2.0.0'
 pipeline {
