@@ -1,5 +1,5 @@
 def JFrog_registry = 'http://44.222.184.55:8082/'
-def Docker_registry = 'https://docker.io/'
+def Docker_registry = 'https://index.docker.io/v1/'
 def imageName = 'naveen2809/sample-java-app'
 def version   = '2.0.0'
 pipeline {
@@ -92,6 +92,7 @@ pipeline {
                   }
               }
           }
+
       stage("Docker Build ") {
             steps {
               script {
@@ -104,10 +105,9 @@ pipeline {
           steps {
               script {
                   docker.withRegistry(Docker_registry, 'docker-tkn'){
-                      app.push()
-                  }
+                  app.push()
+                }
               }
           }
-      }
     }
 }
