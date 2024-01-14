@@ -1,0 +1,93 @@
+def registry = 'http://44.222.147.213:8082/'
+pipeline {
+    agent {
+        node {
+            label 'maven'
+        }
+    }
+    environment {
+        PATH="/opt/maven/bin:$PATH"
+        scannerHome = tool 'sonar-scanner'
+    }
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+
+        // No Need this if we use Poll SCM (it will automatically clone code)
+        // stage('Git Clone') {
+        //    steps {
+        //        git branch: 'main', credentialsId: 'github-tkn', url: 'https://github.com/kalidindi-naveen/First_Maven.git'
+        //    }
+        // }
+
+        stage('Maven') {
+            steps {
+                echo "-----------------------Build Started-----------------------"
+                sh 'mvn clean install -DskipTests'
+                echo "-----------------------Build Completed-----------------------"
+                echo "-----------------------Test Started-----------------------"
+                sh 'mvn surefire-report:report'
+                echo "-----------------------Test Completed-----------------------"
+            }
+        }
+
+        // stage('Static code analysis: Sonarqube') {
+        //     steps {
+        //         script {
+        //             withCredentials([string(credentialsId: 'sonar-tkn', variable: 'SONAR_TOKEN')]){
+        //                 sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://3.89.81.238:9000/ -Dsonar.login=${SONAR_TOKEN}'
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('SonarQube analysis') {
+            steps{
+                withSonarQubeEnv('sonarCloud') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                script {
+                    timeout(time: 1, unit: 'HOURS'){
+                        def qg = waitForQualityGate()
+                        if(qg.status !='OK') {
+                            error "Pipeline failed due to quality gate failures: ${qg.status}"
+                        }
+                    }  
+                }
+            }
+        }
+
+      stage("Jar Publish") {
+              steps {
+                  script {
+                    echo '<--------------- Jar Publish Started --------------->'
+                    def server = Artifactory.newServer url:registry+"/artifactory" ,  credentialsId:"jfrog-tkn"
+                    def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
+                    def uploadSpec = """{
+                        "files": [
+                          {
+                            "pattern": "target/(*)",
+                            "target": "first_maven-libs-release-local/{1}",
+                            "flat": "false",
+                            "props" : "${properties}",
+                            "exclusions": [ "*.sha1", "*.md5"]
+                          }
+                        ]
+                    }"""
+                    def buildInfo = server.upload(uploadSpec)
+                    buildInfo.env.collect()
+                    server.publishBuildInfo(buildInfo)
+                    echo '<--------------- Jar Publish Ended --------------->'
+                  }
+              }
+          }
+    }
+}
